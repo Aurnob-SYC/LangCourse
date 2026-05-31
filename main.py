@@ -15,29 +15,49 @@ if hasattr(sys.stdout, "reconfigure"):
 if hasattr(sys.stderr, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8")
 
-print(f"LangChain Core version: {core_version}")
-print(f"LangGraph version: {lg_version}")
-
 
 OPENROUTER_BASE_URL = (os.getenv("OPENROUTER_BASE_URL") or "https://openrouter.ai/api/v1").strip()
 OPENROUTER_API_KEY = (os.getenv("OPENROUTER_API_KEY") or "").strip()
 DEFAULT_MODEL = (os.getenv("DEFAULT_MODEL") or "deepseek/deepseek-v4-flash").strip()
 
 
-def main():
-    if not OPENROUTER_API_KEY:
+def print_versions():
+    print(f"LangChain Core version: {core_version}")
+    print(f"LangGraph version: {lg_version}")
+
+
+def get_llm(model: str, base_url: str, api_key: str, temperature: float = 0.7) -> ChatOpenAI:
+    if not api_key:
         raise RuntimeError("OPENROUTER_API_KEY is missing. Set it in .env before running this script.")
 
-    llm = ChatOpenAI(
-        model=DEFAULT_MODEL,
-        temperature=0.7,
-        base_url=OPENROUTER_BASE_URL,
-        api_key=OPENROUTER_API_KEY,
+    return ChatOpenAI(
+        model=model,
+        temperature=temperature,
+        base_url=base_url,
+        api_key=api_key,
     )
-    response = llm.invoke("who are you?")
-    print(f"Model: {DEFAULT_MODEL}")
+
+
+def ask_model(llm: ChatOpenAI, prompt: str):
+    return llm.invoke(prompt)
+
+
+def print_response(model: str, response) -> None:
+    print(f"Model: {model}")
     print(f"Response from LLM: {response.content}")
 
+
+def main(
+    model: str = DEFAULT_MODEL,
+    base_url: str = OPENROUTER_BASE_URL,
+    api_key: str = OPENROUTER_API_KEY,
+    prompt: str = "who are you?",
+    temperature: float = 0.7,
+):
+    print_versions()
+    llm = get_llm(model=model, base_url=base_url, api_key=api_key, temperature=temperature)
+    response = ask_model(llm, prompt)
+    print_response(model, response)
     print("setup complete")
 
 
