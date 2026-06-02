@@ -1,5 +1,6 @@
 # Activate virtual environment:
     - python -m venv .venv
+    - .venv\Scripts\activate.bat
 # Deactivate vm:
     - deactivate
 # Start the project:
@@ -9,4 +10,6 @@
     - load_dotenv()
 
 # dependencies:
-    uv add langchain_community, langchain, langchain-core...
+    - langchain
+    - chromadb
+    - dotenv
